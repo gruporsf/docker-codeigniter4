@@ -1,0 +1,43 @@
+version: '3.1'
+services:
+            
+    codeigniter4_web:
+        build: ./docker/php-apache
+        container_name: codeigniter4_web
+        links:
+            - codeigniter4_mysql
+        volumes:
+            - './transfer:/var/transfer'
+            - './www:/var/www/html'
+            - './docker/php-apache/sites-available:/etc/apache2/sites-available'
+        ports:
+            - '6080:80'
+
+    codeigniter4_mysql:
+        image: 'mysql:5.7'
+        container_name: codeigniter4_mysql
+        volumes:
+            - "./transfer:/var/transfer"
+            - "./docker/mysql/conf:/etc/mysql/conf.d"
+            - "./docker/mysql/db:/var/lib/mysql"
+        environment:
+            - MYSQL_ROOT_PASSWORD=secret
+            - MYSQL_DATABASE=codeigniter4
+            - MYSQL_USER=ricardo
+            - MYSQL_PASSWORD=123456
+        ports:
+            - '6081:3306'
+
+    codeigniter4_phpmyadmin:
+        image: phpmyadmin/phpmyadmin:5.0.2
+        container_name: 'codeigniter4_phpmyadmin'
+        links:
+          - codeigniter4_mysql
+        environment:
+          PMA_HOST: codeigniter4_mysql
+          PMA_PORT: 3306
+        ports:
+          - 6082:80
+        volumes:
+          - ./docker/phpmyadmin/sessions:/sessions
+            
